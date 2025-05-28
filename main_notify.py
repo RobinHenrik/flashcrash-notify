@@ -1,10 +1,11 @@
 import asyncio
-from monitor import TICKERS, DROP_THRESHOLD, RISE_THRESHOLD, check_price_drop
+from monitor import TICKERS, DROP_THRESHOLD, RISE_THRESHOLD, check_price_drop, fetch_sp500_history
 from TelegramNotifier import TelegramNotifier
 
 async def notify_if_major_movement(notifier):
+    all_data = fetch_sp500_history()
     for ticker in TICKERS:
-        latest_price, past_price, change = check_price_drop(ticker)
+        latest_price, past_price, change = check_price_drop(all_data, ticker)
         if latest_price is None or past_price is None or change is None:
             continue
 
@@ -26,6 +27,7 @@ async def notify_if_major_movement(notifier):
                 f"Change: {change * 100:.2f} %"
             )
             await notifier.send_message(escape_markdown(message))
+        '''
         else:
             message = (
                 f"😴😴 *No major movement* 😴😴\n"
@@ -35,6 +37,7 @@ async def notify_if_major_movement(notifier):
                 f"Change: {change * 100:.2f} %"
             )
             await notifier.send_message(escape_markdown(message))
+        '''
 
 def escape_markdown(text):
     escape_chars = r'-.!'
