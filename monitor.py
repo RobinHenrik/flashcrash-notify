@@ -66,13 +66,3 @@ def print_movement(ticker, latest_price, past_price, change, drop_threshold, ris
               f"Price from 60 minutes ago/yesterday: ${past_price:.2f}\n"
               f"Change: {change*100:.2f} %\n\n"
               f"{separator}")
-
-
-def main():
-    for ticker in TICKERS:
-        latest_price, past_price, change = check_price_drop(ticker)
-        print_movement(ticker, latest_price, past_price, change, DROP_THRESHOLD, RISE_THRESHOLD)
-
-if __name__ == "__main__":
-    main()
-
