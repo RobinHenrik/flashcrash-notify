@@ -1,6 +1,11 @@
 import yfinance as yf
+import pandas as pd
+
 
 TICKERS = ["AAPL", "MSFT", "AMZN", "GOOGL"]
+DROP_THRESHOLD = 0.10 # 10% drop in stock price
+RISE_THRESHOLD = 0.10 # 10% rise in stock price
+LOOKBACK_MINUTES = 60 # Lookback period in minutes in which the drop threshold is checked against
 
 def get_latest_price(ticker):
     data = yf.Ticker(ticker).history(period="1d", interval="1m")
@@ -10,13 +15,55 @@ def get_latest_price(ticker):
     else:
         return None
 
+def check_price_drop(ticker):
+    ticker_obj = yf.Ticker(ticker)
+    data = ticker_obj.history(period="2d", interval="1m")
+    if data.empty:
+        return None, None, None
+
+    latest_price =float(data['Close'].iloc[-1])
+
+    if len(data) > LOOKBACK_MINUTES:
+        # Market has been open for more than LOOKBACK_MINUTES
+        past_price = float(data['Close'].iloc[-LOOKBACK_MINUTES])
+    else:
+        # Market has been open for less than LOOKBACK_MINUTES
+        # Use yesterday's closing price
+        # Find last row where the date is *yesterday* (because after-hours/minute data may be weird)
+        yesterday = data.index[-1].normalize() - pd.Timedelta(days=1)
+        yday_data = data[data.index.normalize() == yesterday]
+        if yday_data.empty:
+            return None, None, None
+        past_price = float(yday_data['Close'].iloc[-1])
+
+    change = (latest_price - past_price) / past_price
+    return latest_price, past_price, change
+
+
 def main():
     for ticker in TICKERS:
-        price = get_latest_price(ticker)
-        if price:
-            print(f"{ticker}: ${price:.2f}")
+        latest_price, past_price, change = check_price_drop(ticker)
+
+        if latest_price is None or past_price is None or change is None:
+            print(f"Could not retrieve data for {ticker}.\n")
+            print("---------------------------------------------------------------------\n")
+            continue
+
+        if change <= -DROP_THRESHOLD:
+            print(f"MAJOR PRICE DROP: \n {ticker}: \n Current price: ${latest_price:.2f} \n Price from 60 minutes ago/yesterday: ${past_price:.2f} \n Change: {change*100:.2f} %")
+            print()
+            print("---------------------------------------------------------------------")
+            print()
+        elif change >= RISE_THRESHOLD:
+            print(f"MAJOR PRICE RISE: \n {ticker}: \n Current price: ${latest_price:.2f} \n Price from 60 minutes ago/yesterday: ${past_price:.2f} \n Change: {change*100:.2f} %")
+            print()
+            print("---------------------------------------------------------------------")
+            print()
         else:
-            print(f"{ticker}: Price not found")
+            print(f"No major movement: \n {ticker}: \n Current price: ${latest_price:.2f} \n Price from 60 minutes ago/yesterday: ${past_price:.2f} \n Change: {change*100:.2f} %")
+            print()
+            print("---------------------------------------------------------------------")
+            print()
 
 if __name__ == "__main__":
     main()
