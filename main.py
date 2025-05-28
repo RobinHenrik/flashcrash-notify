@@ -39,31 +39,39 @@ def check_price_drop(ticker):
     change = (latest_price - past_price) / past_price
     return latest_price, past_price, change
 
+def print_movement(ticker, latest_price, past_price, change, drop_threshold, rise_threshold):
+    separator = "---------------------------------------------------------------------\n"
+    if latest_price is None or past_price is None or change is None:
+        print(f"Could not retrieve data for {ticker}.\n{separator}")
+        return
+
+    if change <= -drop_threshold:
+        print(f"MAJOR PRICE DROP:\n"
+              f"{ticker}:\n"
+              f"Current price: ${latest_price:.2f}\n"
+              f"Price from 60 minutes ago/yesterday: ${past_price:.2f}\n"
+              f"Change: {change*100:.2f} %\n\n"
+              f"{separator}")
+    elif change >= rise_threshold:
+        print(f"MAJOR PRICE RISE:\n"
+              f"{ticker}:\n"
+              f"Current price: ${latest_price:.2f}\n"
+              f"Price from 60 minutes ago/yesterday: ${past_price:.2f}\n"
+              f"Change: {change*100:.2f} %\n\n"
+              f"{separator}")
+    else:
+        print(f"No major movement:\n"
+              f"{ticker}:\n"
+              f"Current price: ${latest_price:.2f}\n"
+              f"Price from 60 minutes ago/yesterday: ${past_price:.2f}\n"
+              f"Change: {change*100:.2f} %\n\n"
+              f"{separator}")
+
 
 def main():
     for ticker in TICKERS:
         latest_price, past_price, change = check_price_drop(ticker)
-
-        if latest_price is None or past_price is None or change is None:
-            print(f"Could not retrieve data for {ticker}.\n")
-            print("---------------------------------------------------------------------\n")
-            continue
-
-        if change <= -DROP_THRESHOLD:
-            print(f"MAJOR PRICE DROP: \n {ticker}: \n Current price: ${latest_price:.2f} \n Price from 60 minutes ago/yesterday: ${past_price:.2f} \n Change: {change*100:.2f} %")
-            print()
-            print("---------------------------------------------------------------------")
-            print()
-        elif change >= RISE_THRESHOLD:
-            print(f"MAJOR PRICE RISE: \n {ticker}: \n Current price: ${latest_price:.2f} \n Price from 60 minutes ago/yesterday: ${past_price:.2f} \n Change: {change*100:.2f} %")
-            print()
-            print("---------------------------------------------------------------------")
-            print()
-        else:
-            print(f"No major movement: \n {ticker}: \n Current price: ${latest_price:.2f} \n Price from 60 minutes ago/yesterday: ${past_price:.2f} \n Change: {change*100:.2f} %")
-            print()
-            print("---------------------------------------------------------------------")
-            print()
+        print_movement(ticker, latest_price, past_price, change, DROP_THRESHOLD, RISE_THRESHOLD)
 
 if __name__ == "__main__":
     main()
