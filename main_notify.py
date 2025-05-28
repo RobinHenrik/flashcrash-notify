@@ -1,6 +1,8 @@
 import asyncio
-from monitor import TICKERS, DROP_THRESHOLD, RISE_THRESHOLD, check_price_drop, fetch_sp500_history
+
 from TelegramNotifier import TelegramNotifier
+from monitor import TICKERS, check_price_drop, fetch_sp500_history
+
 
 async def notify_if_major_movement(notifier):
     all_data = fetch_sp500_history()
@@ -9,35 +11,8 @@ async def notify_if_major_movement(notifier):
         if latest_price is None or past_price is None or change is None:
             continue
 
-        if change <= -DROP_THRESHOLD:
-            message = (
-                f"🚨 *MAJOR PRICE DROP* 🚨\n"
-                f"${ticker}\n"
-                f"Current: ${latest_price:.2f}\n"
-                f"Prev: ${past_price:.2f}\n"
-                f"Change: {change * 100:.2f} %"
-            )
-            await notifier.send_message(escape_markdown(message))
-        elif change >= RISE_THRESHOLD:
-            message = (
-                f"🚀 *MAJOR PRICE RISE* 🚀\n"
-                f"${ticker}\n"
-                f"Current: ${latest_price:.2f}\n"
-                f"Prev: ${past_price:.2f}\n"
-                f"Change: {change * 100:.2f} %"
-            )
-            await notifier.send_message(escape_markdown(message))
-        '''
-        else:
-            message = (
-                f"😴😴 *No major movement* 😴😴\n"
-                f"${ticker}\n"
-                f"Current: ${latest_price:.2f}\n"
-                f"Prev: ${past_price:.2f}\n"
-                f"Change: {change * 100:.2f} %"
-            )
-            await notifier.send_message(escape_markdown(message))
-        '''
+        await notifier.notify(ticker, latest_price, past_price, change)
+
 
 def escape_markdown(text):
     escape_chars = r'-.!'
