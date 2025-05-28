@@ -26,6 +26,7 @@ async def notify_if_major_movement(notifier):
                 f"Change: {change * 100:.2f} %"
             )
             await notifier.send_message(escape_markdown(message))
+        '''
         else:
             message = (
                 f"😴😴 *No major movement* 😴😴\n"
@@ -35,6 +36,7 @@ async def notify_if_major_movement(notifier):
                 f"Change: {change * 100:.2f} %"
             )
             await notifier.send_message(escape_markdown(message))
+        '''
 
 def escape_markdown(text):
     escape_chars = r'-.!'
