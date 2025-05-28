@@ -1,10 +1,17 @@
 import yfinance as yf
 import pandas as pd
 
+def get_sp500_tickers():
+    url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
+    tables = pd.read_html(url)
+    df = tables[0] # First table is what we need
+    # Replace '.' with '-' for yfinance compatibility
+    return [symbol.replace('.', '-') for symbol in df['Symbol'].tolist()]
 
-TICKERS = ["AAPL", "MSFT", "AMZN", "GOOGL"]
-DROP_THRESHOLD = 0.10 # 10% drop in stock price
-RISE_THRESHOLD = 0.10 # 10% rise in stock price
+
+TICKERS = get_sp500_tickers()
+DROP_THRESHOLD = 0.05 # 10% drop in stock price
+RISE_THRESHOLD = 0.05 # 10% rise in stock price
 LOOKBACK_MINUTES = 60 # Lookback period in minutes in which the drop threshold is checked against
 
 def get_latest_price(ticker):

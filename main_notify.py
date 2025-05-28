@@ -11,7 +11,7 @@ async def notify_if_major_movement(notifier):
         if change <= -DROP_THRESHOLD:
             message = (
                 f"🚨 *MAJOR PRICE DROP* 🚨\n"
-                f"{ticker}\n"
+                f"${ticker}\n"
                 f"Current: ${latest_price:.2f}\n"
                 f"Prev: ${past_price:.2f}\n"
                 f"Change: {change * 100:.2f} %"
@@ -20,7 +20,7 @@ async def notify_if_major_movement(notifier):
         elif change >= RISE_THRESHOLD:
             message = (
                 f"🚀 *MAJOR PRICE RISE* 🚀\n"
-                f"{ticker}\n"
+                f"${ticker}\n"
                 f"Current: ${latest_price:.2f}\n"
                 f"Prev: ${past_price:.2f}\n"
                 f"Change: {change * 100:.2f} %"
@@ -29,7 +29,7 @@ async def notify_if_major_movement(notifier):
         else:
             message = (
                 f"😴😴 *No major movement* 😴😴\n"
-                f"{ticker}\n"
+                f"${ticker}\n"
                 f"Current: ${latest_price:.2f}\n"
                 f"Prev: ${past_price:.2f}\n"
                 f"Change: {change * 100:.2f} %"
