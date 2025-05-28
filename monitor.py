@@ -1,11 +1,30 @@
 import yfinance as yf
 import pandas as pd
 
+def get_sp500_tickers():
+    url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
+    tables = pd.read_html(url)
+    df = tables[0] # First table is what we need
+    # Replace '.' with '-' for yfinance compatibility
+    return [symbol.replace('.', '-') for symbol in df['Symbol'].tolist()]
 
-TICKERS = ["AAPL", "MSFT", "AMZN", "GOOGL"]
+
+TICKERS = get_sp500_tickers()
 DROP_THRESHOLD = 0.10 # 10% drop in stock price
 RISE_THRESHOLD = 0.10 # 10% rise in stock price
 LOOKBACK_MINUTES = 60 # Lookback period in minutes in which the drop threshold is checked against
+
+
+def fetch_sp500_history():
+    return yf.download(
+        TICKERS,
+        period="2d",
+        interval="1m",
+        group_by="ticker",
+        auto_adjust=True,
+        threads=True,  # use threading for even more speed
+        progress=False
+    )
 
 def get_latest_price(ticker):
     data = yf.Ticker(ticker).history(period="1d", interval="1m")
@@ -15,11 +34,12 @@ def get_latest_price(ticker):
     else:
         return None
 
-def check_price_drop(ticker):
-    ticker_obj = yf.Ticker(ticker)
-    data = ticker_obj.history(period="2d", interval="1m")
-    if data.empty:
+def check_price_drop(all_data, ticker):
+    # Handle the case where only one ticker is present (no multi-level columns)
+    if ticker not in all_data.columns.get_level_values(0):
         return None, None, None
+
+    data = all_data[ticker].dropna()
 
     latest_price =float(data['Close'].iloc[-1])
 
@@ -38,31 +58,3 @@ def check_price_drop(ticker):
 
     change = (latest_price - past_price) / past_price
     return latest_price, past_price, change
-
-def print_movement(ticker, latest_price, past_price, change, drop_threshold, rise_threshold):
-    separator = "---------------------------------------------------------------------\n"
-    if latest_price is None or past_price is None or change is None:
-        print(f"Could not retrieve data for {ticker}.\n{separator}")
-        return
-
-    if change <= -drop_threshold:
-        print(f"MAJOR PRICE DROP:\n"
-              f"{ticker}:\n"
-              f"Current price: ${latest_price:.2f}\n"
-              f"Price from 60 minutes ago/yesterday: ${past_price:.2f}\n"
-              f"Change: {change*100:.2f} %\n\n"
-              f"{separator}")
-    elif change >= rise_threshold:
-        print(f"MAJOR PRICE RISE:\n"
-              f"{ticker}:\n"
-              f"Current price: ${latest_price:.2f}\n"
-              f"Price from 60 minutes ago/yesterday: ${past_price:.2f}\n"
-              f"Change: {change*100:.2f} %\n\n"
-              f"{separator}")
-    else:
-        print(f"No major movement:\n"
-              f"{ticker}:\n"
-              f"Current price: ${latest_price:.2f}\n"
-              f"Price from 60 minutes ago/yesterday: ${past_price:.2f}\n"
-              f"Change: {change*100:.2f} %\n\n"
-              f"{separator}")
