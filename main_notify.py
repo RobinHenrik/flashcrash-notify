@@ -13,11 +13,6 @@ async def notify_if_major_movement(notifier):
 
         await notifier.notify(ticker, latest_price, past_price, change)
 
-
-def escape_markdown(text):
-    escape_chars = r'-.!'
-    return ''.join('\\' + c if c in escape_chars else c for c in text)
-
 if __name__ == "__main__":
     import os
     from dotenv import load_dotenv
