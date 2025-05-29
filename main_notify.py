@@ -1,14 +1,23 @@
 import asyncio
+import logging
 import os
 
 from apscheduler.schedulers.blocking import BlockingScheduler
-
-from TelegramNotifier import TelegramNotifier
-from market_utils import is_market_open
-from monitor import TICKERS, check_price_drop, fetch_sp500_history, DROP_THRESHOLD, RISE_THRESHOLD
-from alert_state import should_send_alert
 from dotenv import load_dotenv
 
+from TelegramNotifier import TelegramNotifier
+from alert_state import should_send_alert
+from market_utils import is_market_open
+from monitor import TICKERS, check_price_drop, fetch_sp500_history, DROP_THRESHOLD, RISE_THRESHOLD
+
+main_handler = logging.FileHandler("flashcrash_logs.log")
+main_handler.setLevel(logging.INFO)
+main_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s [%(name)s] %(message)s"))
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    handlers=[main_handler]
+)
 
 
 async def notify_if_major_movement(notifier):
@@ -28,10 +37,9 @@ async def notify_if_major_movement(notifier):
 
 def job():
     if not is_market_open():
-        print("market closed")
         return
 
-    print("Job started")
+    logging.info("Job started")
     # Token and group_id come from the .env file
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     group_id = os.getenv("TELEGRAM_GROUP_ID")

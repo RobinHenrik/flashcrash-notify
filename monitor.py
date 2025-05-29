@@ -11,8 +11,8 @@ def get_sp500_tickers():
 
 
 TICKERS = get_sp500_tickers()
-DROP_THRESHOLD = 0.03 # 10% drop in stock price
-RISE_THRESHOLD = 0.03 # 10% rise in stock price
+DROP_THRESHOLD = 0.045 # 10% drop in stock price
+RISE_THRESHOLD = 0.045 # 10% rise in stock price
 LOOKBACK_MINUTES = 60 # Lookback period in minutes in which the drop threshold is checked against
 
 
