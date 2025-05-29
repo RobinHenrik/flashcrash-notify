@@ -50,7 +50,6 @@ def check_price_drop(all_data, ticker):
     # Get the dates for each row, normalized (date only, no time)
     all_dates = data.index.normalize()
     today = all_dates[-1]
-    today_mask = (all_dates == today)
     today_indices = np.where(all_dates == today)[0]
 
     if len(today_indices) > LOOKBACK_MINUTES:
