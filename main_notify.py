@@ -20,9 +20,9 @@ async def notify_if_major_movement(notifier):
         await notifier.notify(ticker, latest_price, past_price, change)
 
 def job():
-    #if not is_market_open():
-     #   print("market closed")
-      #  return
+    if not is_market_open():
+        print("market closed")
+        return
 
     # Token and group_id come from the .env file
     token = os.getenv("TELEGRAM_BOT_TOKEN")
