@@ -1,5 +1,6 @@
 import yfinance as yf
 import pandas as pd
+import numpy as np
 
 def get_sp500_tickers():
     url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
@@ -41,20 +42,27 @@ def check_price_drop(all_data, ticker):
 
     data = all_data[ticker].dropna()
 
+    if data.empty:
+        return None, None, None
+
     latest_price =float(data['Close'].iloc[-1])
 
-    if len(data) > LOOKBACK_MINUTES:
+    # Get the dates for each row, normalized (date only, no time)
+    all_dates = data.index.normalize()
+    today = all_dates[-1]
+    today_mask = (all_dates == today)
+    today_indices = np.where(all_dates == today)[0]
+
+    if len(today_indices) > LOOKBACK_MINUTES:
         # Market has been open for more than LOOKBACK_MINUTES
         past_price = float(data['Close'].iloc[-LOOKBACK_MINUTES])
     else:
         # Market has been open for less than LOOKBACK_MINUTES
-        # Use yesterday's closing price
-        # Find last row where the date is *yesterday* (because after-hours/minute data may be weird)
-        yesterday = data.index[-1].normalize() - pd.Timedelta(days=1)
-        yday_data = data[data.index.normalize() == yesterday]
-        if yday_data.empty:
-            return None, None, None
-        past_price = float(yday_data['Close'].iloc[-1])
+        # Use the previous trading day's close (i.e., the last row before today)
+        # Not enough data for today—use previous trading day's close
+        if today_indices[0] == 0:
+            return None, None, None  # There is no previous day
+        past_price = float(data['Close'].iloc[today_indices[0] - 1])
 
     change = (latest_price - past_price) / past_price
     return latest_price, past_price, change
