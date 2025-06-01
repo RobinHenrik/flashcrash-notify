@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 
+from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 from dotenv import load_dotenv
 
@@ -46,8 +47,8 @@ def job():
     notifier = TelegramNotifier(token, group_id)
     asyncio.run(notify_if_major_movement(notifier))
 
-if __name__ == "__main__":
+def start():
     load_dotenv() # Load the .env file in
-    scheduler = BlockingScheduler()
+    scheduler = BackgroundScheduler()
     scheduler.add_job(job, 'interval', minutes=1) # Runs jobs sequentially
     scheduler.start()
