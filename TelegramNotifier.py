@@ -45,8 +45,9 @@ class TelegramNotifier:
 
     async def notify(self, ticker, latest_price, past_price, change):
         if change <= -DROP_THRESHOLD or change >= RISE_THRESHOLD:
+            direction = "RISE" if change >= RISE_THRESHOLD else "DROP"
             message = format_message(ticker, latest_price, past_price, change)
-            alert_logger.info(f"Sent alert for {ticker}: change={change:.2%} from ${past_price:.2f} to ${latest_price:.2f}")
+            alert_logger.info(f"Sent {direction} alert for ${ticker}: change={change:.2%} from ${past_price:.2f} to ${latest_price:.2f}")
             await self.send_message(message)
         '''
         else:
