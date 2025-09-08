@@ -1,13 +1,26 @@
-from contextlib import asynccontextmanager
-
 from fastapi import FastAPI
-
+from fastapi.middleware.cors import CORSMiddleware
 import main_notify
 
 main_notify.start()
 app = FastAPI()
 
+origins = [
+    "http://localhost:5173",
+    "https://pornokuningad.pro",
+]
+
+# ✅ Correct way to add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 LOG_FILE_PATH = "flashcrash_logs.log"
+ALERT_FILE_PATH = "alerts.log"
 
 def tail_log(path, n_lines=50):
     try:
@@ -23,11 +36,16 @@ def tail_log(path, n_lines=50):
                 f.seek(-seek_size, 1)
                 size -= seek_size
             lines = b'\n'.join(data.splitlines()[-n_lines:]).decode(errors="replace").split('\n')
-            return lines
+            return lines[::-1]
     except Exception as e:
         return f"Error reading log {e}"
 
 @app.get("/log")
 def read_log():
     log_lines = tail_log(LOG_FILE_PATH)
+    return log_lines
+
+@app.get("/alerts")
+def read_log():
+    log_lines = tail_log(ALERT_FILE_PATH)
     return log_lines
