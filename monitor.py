@@ -3,11 +3,10 @@ import pandas as pd
 import numpy as np
 
 def get_sp500_tickers():
-    url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
-    tables = pd.read_html(url)
-    df = tables[0] # First table is what we need
+    url = "https://raw.githubusercontent.com/datasets/s-and-p-500-companies/master/data/constituents.csv"
+    df = pd.read_csv(url)
     # Replace '.' with '-' for yfinance compatibility
-    return [symbol.replace('.', '-') for symbol in df['Symbol'].tolist()]
+    return df['Symbol'].str.replace('.', '-', regex=False).tolist()
 
 
 TICKERS = get_sp500_tickers()

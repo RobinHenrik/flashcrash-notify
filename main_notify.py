@@ -3,7 +3,6 @@ import logging
 import os
 
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.schedulers.blocking import BlockingScheduler
 from dotenv import load_dotenv
 
 from TelegramNotifier import TelegramNotifier
