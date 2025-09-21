@@ -47,8 +47,7 @@ class TelegramNotifier:
         self.group_id = group_id
 
     async def send_message(self, message):
-        print(message)
-        #await self.bot.send_message(chat_id=self.group_id, text=message, parse_mode="MarkdownV2")
+        await self.bot.send_message(chat_id=self.group_id, text=message, parse_mode="MarkdownV2")
 
     async def notify(self, ticker, latest_price, past_price, change, rsi):
         direction = "RISE" if change >= RISE_THRESHOLD else "DROP"
