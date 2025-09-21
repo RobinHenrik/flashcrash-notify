@@ -10,16 +10,23 @@ def get_sp500_tickers():
 
 
 TICKERS = get_sp500_tickers()
-DROP_THRESHOLD = 0.045 # 10% drop in stock price
-RISE_THRESHOLD = 0.045 # 10% rise in stock price
-LOOKBACK_MINUTES = 60 # Lookback period in minutes in which the drop threshold is checked against
-
 
 def fetch_sp500_history():
     return yf.download(
         TICKERS,
         period="2d",
         interval="1m",
+        group_by="ticker",
+        auto_adjust=True,
+        threads=True,  # use threading for even more speed
+        progress=False
+    )
+
+def fetch_sp500_15day_history():
+    return yf.download(
+        TICKERS,
+        period="15d",
+        interval="1d",
         group_by="ticker",
         auto_adjust=True,
         threads=True,  # use threading for even more speed
@@ -44,7 +51,7 @@ def check_price_drop(all_data, ticker):
     if data.empty:
         return None, None, None
 
-    latest_price =float(data['Close'].iloc[-1])
+    latest_price = float(data['Close'].iloc[-1])
 
     # Get the dates for each row, normalized (date only, no time)
     all_dates = data.index.normalize()

@@ -1,19 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import main_notify
+from config import ORIGINS
 
 main_notify.start()
 app = FastAPI()
 
-origins = [
-    "http://localhost:5173",
-    "https://pornokuningad.pro",
-]
-
-# ✅ Correct way to add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

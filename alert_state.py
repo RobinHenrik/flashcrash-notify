@@ -1,13 +1,15 @@
 import time
 import logging
+
+from config import COOLDOWN_SECONDS
+
 # (ticker, direction) -> timestamp of last alert
 ALERT_HISTORY = {}
-COOLDOWN_SECONDS = 30 * 60 # 30 minutes
 
 def should_send_alert(ticker, direction):
     if direction == "":
         return False
-    key =(ticker, direction)
+    key = (ticker, direction)
     now = time.time()
     last_alert = ALERT_HISTORY.get(key)
     if last_alert and now - last_alert < COOLDOWN_SECONDS:

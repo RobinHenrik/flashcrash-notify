@@ -8,7 +8,9 @@ from dotenv import load_dotenv
 from TelegramNotifier import TelegramNotifier
 from alert_state import should_send_alert
 from market_utils import is_market_open
-from monitor import TICKERS, check_price_drop, fetch_sp500_history, DROP_THRESHOLD, RISE_THRESHOLD
+from monitor import TICKERS, check_price_drop, fetch_sp500_history, DROP_THRESHOLD, RISE_THRESHOLD, \
+    fetch_sp500_15day_history
+from rsi_utils import calculate_rsi
 
 main_handler = logging.FileHandler("flashcrash_logs.log")
 main_handler.setLevel(logging.INFO)
@@ -19,11 +21,13 @@ logging.basicConfig(
     handlers=[main_handler]
 )
 
+data_15day = fetch_sp500_15day_history()
 
 async def notify_if_major_movement(notifier):
-    all_data = fetch_sp500_history()
+    data = fetch_sp500_history()
     for ticker in TICKERS:
-        latest_price, past_price, change = check_price_drop(all_data, ticker)
+        latest_price, past_price, change = check_price_drop(data, ticker)
+        rsi = calculate_rsi(data_15day, ticker)
         if latest_price is None or past_price is None or change is None:
             continue
         direction = ""
@@ -32,7 +36,7 @@ async def notify_if_major_movement(notifier):
         elif change >= RISE_THRESHOLD:
             direction = "rise"
         if should_send_alert(ticker, direction):
-            await notifier.notify(ticker, latest_price, past_price, change)
+            await notifier.notify(ticker, latest_price, past_price, change, rsi)
 
 
 def job():
