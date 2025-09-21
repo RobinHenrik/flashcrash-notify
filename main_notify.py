@@ -53,5 +53,5 @@ def job():
 def start():
     load_dotenv() # Load the .env file in
     scheduler = BackgroundScheduler()
-    scheduler.add_job(job, 'interval', minutes=1) # Runs jobs sequentially
+    scheduler.add_job(job, 'interval', minutes=2) # Runs jobs sequentially
     scheduler.start()
