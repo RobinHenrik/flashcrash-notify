@@ -7,9 +7,9 @@ from dotenv import load_dotenv
 
 from TelegramNotifier import TelegramNotifier
 from alert_state import should_send_alert
+from config import DROP_THRESHOLD, RISE_THRESHOLD
 from market_utils import is_market_open
-from monitor import TICKERS, check_price_drop, fetch_sp500_history, DROP_THRESHOLD, RISE_THRESHOLD, \
-    fetch_sp500_15day_history
+from monitor import TICKERS, check_price_drop, fetch_sp500_history, fetch_sp500_15day_history
 from rsi_utils import calculate_rsi
 
 main_handler = logging.FileHandler("flashcrash_logs.log")
