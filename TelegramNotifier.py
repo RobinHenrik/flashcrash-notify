@@ -34,9 +34,9 @@ def format_message(ticker, latest_price, past_price, change, rsi):
     )
 
     if rsi < 30:
-        message += " oversold"
+        message += " \\(oversold\\)"
     elif rsi > 70:
-        message += " overbought"
+        message += " \\(overbought\\)"
 
     return escape_markdown(message)
 
