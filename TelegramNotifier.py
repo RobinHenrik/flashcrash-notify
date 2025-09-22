@@ -13,7 +13,7 @@ alert_logger.propagate = False  # Prevents alerts from being logged in the main 
 
 
 def escape_markdown(text):
-    escape_chars = r'-.!'
+    escape_chars = r'-.!()'
     return ''.join('\\' + c if c in escape_chars else c for c in text)
 
 def format_message(ticker, latest_price, past_price, change, rsi):
