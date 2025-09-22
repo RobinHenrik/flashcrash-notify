@@ -2,6 +2,9 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 
+from config import LOOKBACK_MINUTES
+
+
 def get_sp500_tickers():
     url = "https://raw.githubusercontent.com/datasets/s-and-p-500-companies/master/data/constituents.csv"
     df = pd.read_csv(url)
